@@ -1,41 +1,32 @@
-def gv
-
 pipeline {
     agent any
-    stages {
-        stage('init') {
+    tools {
+        maven 'Maven'
+    }
+        stage('build jar') {
             steps {
                 script {
-                    gv = load "script.groovy"
+                    echo "Building the application"
+                    sh 'mvn package'
                 }
             }
         }
-        stage('build') {
+        stage('build image') {
             steps {
                 script {
-                    gv.BuildApp()
+                    echo "Building docker image" 
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-repo',passwordVariable:'DOCKERPASS',usernameVariable: 'DOCKERUSR')]) {
+                        sh 'docker build -t zikou/maven-app:1.0 .'
+                        sh "echo $DOCKERPASS | docker login -u $DOCKERUSR --password-stdin"
+                        sh "docker push zikou/maven-app:1.0"
+                    }
                 }
             }
         }
-        stage('test') {
+        stage("deploy") {
             steps {
                 script {
-                    gv.TestApp()
-                }
-            }
-        }
-        stage('deploy') {
-            input {
-                message " select the environment to deploy to"
-                ok "environment selected"
-                parameters {
-                    choice(name:'ENV',choices:['dev','staging','production'],description:'')
-                }
-            }
-            steps {
-                script {
-                    gv.DeployApp()
-                    echo "deploying to ${ENV}"
+                    echo "Deploy the application"
                 }
             }
         }
