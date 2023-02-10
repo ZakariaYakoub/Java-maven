@@ -25,10 +25,17 @@ pipeline {
             }
         }
         stage('deploy') {
+            input {
+                message " select the environment to deploy to"
+                ok "environment selected"
+                parameters {
+                    Choice(name:'ENV',choices:['dev','staging','production'],description:'')
+                }
+            }
             steps {
                 script {
                     gv.DeployApp()
-                    sh "pwd"
+                    echo "deploying to ${ENV}"
                 }
             }
         }
