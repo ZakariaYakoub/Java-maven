@@ -7,7 +7,7 @@ pipeline {
             steps {
                 script {
                     echo "Building the application..."
-                    sh "pwd"
+                    sh 'pwd'
                 }
             }
         }
