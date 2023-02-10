@@ -5,8 +5,9 @@ pipeline {
     stages {
         stage('build') {
             steps {
+                script {
                     echo "Building the application..."
-                    sh "pwd"
+                }
             }
         }
         stage('test') {
